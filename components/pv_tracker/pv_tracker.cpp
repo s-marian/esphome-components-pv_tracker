@@ -116,7 +116,12 @@ double PVTrackerSensor::computeEnergy( double psi, double *sun_vect ) {
     double tmp1[3*3], panel_normal[3];
     double rot_psi[3*3];
 
-    LinearAlgebra::matmult(rx_mat_, LinearAlgebra::Rx3D(psi, rot_psi) , 3, 3, 3, tmp1);
+
+
+    double structure_tilt[3*3];
+    LinearAlgebra::Ry3D(-D2R(south_tilt_angle_), structure_tilt );
+
+    LinearAlgebra::matmult(structure_tilt, LinearAlgebra::Rx3D(-psi, rot_psi) , 3, 3, 3, tmp1);
     LinearAlgebra::matmult(tmp1, unity_up, 3, 3, 1, panel_normal);
 
     ESP_LOGD(TAG, "sun vect                 = %f %f %f", sun_vect[0], sun_vect[1], sun_vect[2]);
