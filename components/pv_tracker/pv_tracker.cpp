@@ -108,7 +108,7 @@ double PVTrackerSensor::getRealAngle(double psi) {
 
 double PVTrackerSensor::computeEnergy( double psi, double *sun_vect ) {
 
-    if ( psi < 2 ) {
+    if ( elevation_ < 2 ) {
         return 0;
     }
 
