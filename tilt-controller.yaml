@@ -1,0 +1,170 @@
+esphome:
+  name: tilt-controller
+
+esp32:
+  board: esp32dev
+  framework:
+    type: arduino
+
+# Enable logging
+logger:
+  level: DEBUG
+
+# Enable Home Assistant API
+api:
+  encryption:
+    key: <KEY>
+
+ota:
+  password: <PASS>
+
+
+wifi:
+  networks:
+    - ssid: !secret wifi_ssid
+      password: !secret wifi_password
+  
+  
+# Enable fallback hotspot (captive portal) in case wifi connection fails
+  ap:
+    ssid: "Test2 Fallback Hotspot"
+    password: <PASS>
+
+captive_portal:
+    
+
+
+external_components:
+
+    #- source: external_components/pv_tracker/components/
+    - source:
+        type: git
+        url: https://github.com/s-marian/esphome-components-pv_tracker
+        ref: main
+      refresh: 0s
+      components: [ pv_tracker ]
+    - source:
+        type: git
+        url: https://github.com/s-marian/esphome-components-mma8452q
+        ref: main
+      refresh: 0s
+      components: [ mma8452q ]
+    - source:
+        type: git
+        url: https://github.com/s-marian/esphome-components-position_controller
+        ref: main
+      refresh: 0s
+      components: [ position_controller ]
+
+
+i2c:
+  sda: 26
+  scl: 27
+  scan: false
+  frequency: 400000
+
+
+sensor:
+  - platform: wifi_signal
+    name: "WiFi Signal Sensor"
+    update_interval: 2s
+
+  - platform: mma8452q
+    address: 0x1C
+    update_interval: 0.7s
+    accel_x:
+      name: "mma8452q Accel X"    
+    accel_y:
+      name: "mma8452q Accel Y"
+    accel_z:
+      name: "mma8452q Accel z"
+    pitch:
+      name: "mma8452q pitch"
+      id: pitch
+      filters:
+        - exponential_moving_average:
+            alpha: 0.33
+            send_every: 1
+    roll:
+      name: "mma8452q roll"
+      id: roll
+      filters:
+        - exponential_moving_average:
+            alpha: 0.33
+            send_every: 1
+  - platform: sun
+    name: Sun Elevation
+    type: elevation
+    id: elevation
+  - platform: sun
+    name: Sun Azimuth
+    type: azimuth
+    id: azimuth
+
+  - platform: homeassistant
+    id: manual_tilt_angle
+    entity_id: input_number.manual_tilt_angle
+
+  - platform: pv_tracker
+    south_tilt_angle: 20
+    tilt_angle_max: 50
+    tilt_angle_min: -50
+    azimuth_sensor: azimuth
+    elevation_sensor: elevation
+    update_interval: 5s
+    installed_panels_capacity: 1000
+    psi_angle:
+      name: "Panels Rotation"
+      id: pv_tracker_angle
+    energy_ideal:
+      name: "Energy at ideal angle"
+    energy_actual:
+      name: "Actual Energy"
+    energy_norot:
+      name: "Energy at 0 degrees rotation"
+
+position_controller:
+  actual_position: roll
+  target_position: pv_tracker_angle
+  target_position_offset: manual_tilt_angle
+  accel_update_frequency: 1.56
+  adjustment_threshold: 1.0
+  pin_a: motor_forward_pin
+  pin_b: motor_reverse_pin
+  
+
+output:
+  - platform: ledc
+    id: motor_forward_pin
+    pin: 13
+  - platform: ledc
+    id: motor_reverse_pin
+    pin: 14
+
+time:
+  - platform: sntp    
+    
+    
+
+web_server:
+  port: 80
+
+
+sun:
+  latitude: 45.5746°
+  longitude: 25.4540°
+  id: sun_sun
+
+text_sensor:
+  - platform: wifi_info
+    ip_address:
+      name: ESP IP Address
+    ssid:
+      name: ESP Connected SSID
+    bssid:
+      name: ESP Connected BSSID
+    mac_address:
+      name: ESP Mac Wifi Address
+    scan_results:
+      name: ESP Latest Scan Results
+
