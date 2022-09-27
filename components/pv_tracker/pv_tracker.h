@@ -14,6 +14,7 @@ class PVTrackerSensor : public PollingComponent {
   void set_psi_sensor(sensor::Sensor *sensor) { psi_sensor_ = sensor; }
   void set_energy_actual_sensor(sensor::Sensor *sensor) { energy_actual_sensor_ = sensor; }
   void set_energy_ideal_sensor(sensor::Sensor *sensor) { energy_ideal_sensor_ = sensor; }
+  void set_energy_norot_sensor(sensor::Sensor *sensor) { energy_norot_sensor_ = sensor; }
   void set_south_tilt_angle(float angle);
   void set_tilt_angle_bounds(float min, float max) { tilt_angle_min_ = min; tilt_angle_max_ = max; }
   void set_installed_capacity(double val) { installed_capacity_ = val; }
@@ -36,7 +37,7 @@ class PVTrackerSensor : public PollingComponent {
 
 
  private:
-  double getPanelAngleEnergy(double &realPsi, double &energyIdeal, double &energyReal);
+  double getPanelAngleEnergy(double &realPsi, double &energyIdeal, double &energyReal, double &energyNoRot);
   double getRealAngle(double psi);
   double computeEnergy( double psi, double *sun_vect );
 
@@ -47,13 +48,14 @@ class PVTrackerSensor : public PollingComponent {
   sensor::Sensor *psi_sensor_;
   sensor::Sensor *energy_ideal_sensor_{nullptr};
   sensor::Sensor *energy_actual_sensor_{nullptr};
+  sensor::Sensor *energy_norot_sensor_{nullptr};
   float south_tilt_angle_;
   float tilt_angle_max_, tilt_angle_min_;
   float installed_capacity_ {1000};
 
   double azimuth_, elevation_;
   double panel_angle_;
-  double energy_real_, energy_ideal_;
+  double energy_real_, energy_ideal_, energy_norot_;
   double rx_mat_[3*3];
 
 

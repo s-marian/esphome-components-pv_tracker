@@ -21,7 +21,7 @@ void PVTrackerSensor::update() {
     }
     azimuth_ = azimuth_sensor_->state;
     elevation_ = elevation_sensor_->state;
-    getPanelAngleEnergy(panel_angle_, energy_ideal_, energy_real_);
+    getPanelAngleEnergy(panel_angle_, energy_ideal_, energy_real_, energy_norot_);
 
     psi_sensor_->publish_state(panel_angle_);
 
@@ -31,6 +31,10 @@ void PVTrackerSensor::update() {
 
     if ( energy_actual_sensor_ != nullptr ) {
         energy_actual_sensor_->publish_state(energy_real_);
+    }
+
+    if ( energy_norot_sensor_ != nullptr ) {
+        energy_norot_sensor_->publish_state(energy_norot_);
     }
 
     ESP_LOGD(TAG, "azimuth=%f elevation=%f panel_angle=%f", azimuth_, elevation_, panel_angle_ );
@@ -45,7 +49,7 @@ void PVTrackerSensor::set_south_tilt_angle(float angle) {
 }
 
 
-double PVTrackerSensor::getPanelAngleEnergy(double &realPsi, double &energyIdeal, double &energyReal) {
+double PVTrackerSensor::getPanelAngleEnergy(double &realPsi, double &energyIdeal, double &energyReal, double &energyNoRot) {
     double sun_vect_prerot[3];
     double sun_vect[3];
     LinearAlgebra::sphericToCart(1, PI/2 - D2R(elevation_), D2R(azimuth_), sun_vect_prerot);
@@ -65,12 +69,14 @@ double PVTrackerSensor::getPanelAngleEnergy(double &realPsi, double &energyIdeal
     energyIdeal = computeEnergy(psi, sun_vect_prerot) * installed_capacity_;
     realPsi     = getRealAngle(psi);
     energyReal  = computeEnergy(D2R(realPsi), sun_vect_prerot) * installed_capacity_;
+    energyNoRot = computeEnergy(0, sun_vect_prerot) * installed_capacity_;
 
     ESP_LOGD(TAG, "sun prerot  XYZ          = %f %f %f", sun_vect_prerot[0], sun_vect_prerot[1], sun_vect_prerot[2]);
     ESP_LOGD(TAG, "sun postrot XYZ          = %f %f %f", sun_vect[0], sun_vect[1], sun_vect[2]);
     ESP_LOGD(TAG, "pv  tilt (pre/post/real) = %.1f %.1f %.1f", R2D(psi_prerot), R2D(psi), realPsi );
     ESP_LOGD(TAG, "energy ideal             = %.2f"     , energyIdeal );
     ESP_LOGD(TAG, "energy real              = %.2f"     , energyReal );
+    ESP_LOGD(TAG, "energy assuming no rot   = %.2f"     , energyNoRot );
 
     return realPsi;
 }

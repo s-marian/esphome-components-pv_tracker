@@ -22,6 +22,7 @@ CONF_TILT_ANGLE_MIN = "tilt_angle_min"
 CONF_PSI_ANGLE = "psi_angle"
 CONF_ENERGY_IDEAL = "energy_ideal"
 CONF_ENERGY_ACTUAL = "energy_actual"
+CONF_ENERGY_NOROT = "energy_norot"
 CONF_INSTALLED_CAPACITY = "installed_panels_capacity"
 
 # CONFIG_SCHEMA = (
@@ -72,6 +73,7 @@ CONFIG_SCHEMA = (
            ,cv.Required(CONF_PSI_ANGLE): angle_schema
            ,cv.Optional(CONF_ENERGY_IDEAL): energy_schema
            ,cv.Optional(CONF_ENERGY_ACTUAL): energy_schema
+           ,cv.Optional(CONF_ENERGY_NOROT): energy_schema
         }
     )
     .extend(cv.polling_component_schema("5s"))
@@ -97,7 +99,7 @@ async def to_code(config):
     if CONF_INSTALLED_CAPACITY in config:
         cg.add(var.set_installed_capacity(config[CONF_INSTALLED_CAPACITY]))
 
-    for type in ["actual", "ideal"]:
+    for type in ["actual", "ideal", "norot" ]:
         key = f"energy_{type}"
         if key in config:
             energy_sens = await sensor.new_sensor(config[key])
