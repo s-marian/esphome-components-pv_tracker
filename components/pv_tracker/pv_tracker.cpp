@@ -64,7 +64,7 @@ double PVTrackerSensor::getPanelAngleEnergy(double &realPsi, double &energyIdeal
 
     energyIdeal = computeEnergy(psi, sun_vect_prerot) * installed_capacity_;
     realPsi     = getRealAngle(psi);
-    energyReal  = computeEnergy(realPsi, sun_vect_prerot) * installed_capacity_;
+    energyReal  = computeEnergy(D2R(realPsi), sun_vect_prerot) * installed_capacity_;
 
     ESP_LOGD(TAG, "sun prerot  XYZ          = %f %f %f", sun_vect_prerot[0], sun_vect_prerot[1], sun_vect_prerot[2]);
     ESP_LOGD(TAG, "sun postrot XYZ          = %f %f %f", sun_vect[0], sun_vect[1], sun_vect[2]);
