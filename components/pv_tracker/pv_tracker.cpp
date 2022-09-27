@@ -119,6 +119,9 @@ double PVTrackerSensor::computeEnergy( double psi, double *sun_vect ) {
     LinearAlgebra::matmult(rx_mat_, LinearAlgebra::Rx3D(psi, rot_psi) , 3, 3, 3, tmp1);
     LinearAlgebra::matmult(tmp1, unity_up, 3, 3, 1, panel_normal);
 
+    ESP_LOGD(TAG, "sun vect                 = %f %f %f", sun_vect[0], sun_vect[1], sun_vect[2]);
+    ESP_LOGD(TAG, "panel normal             = %f %f %f", panel_normal[0], panel_normal[1], panel_normal[2]);
+
     return LinearAlgebra::dotProduct(panel_normal, sun_vect, 3);
 
 }
