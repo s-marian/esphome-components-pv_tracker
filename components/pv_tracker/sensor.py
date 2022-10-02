@@ -24,6 +24,7 @@ CONF_ENERGY_IDEAL = "energy_ideal"
 CONF_ENERGY_ACTUAL = "energy_actual"
 CONF_ENERGY_NOROT = "energy_norot"
 CONF_INSTALLED_CAPACITY = "installed_panels_capacity"
+CONF_INSTALLED_ALTITUDE = "altitude"
 
 # CONFIG_SCHEMA = (
 #     sensor.sensor_schema(
@@ -74,6 +75,7 @@ CONFIG_SCHEMA = (
            ,cv.Optional(CONF_ENERGY_IDEAL): energy_schema
            ,cv.Optional(CONF_ENERGY_ACTUAL): energy_schema
            ,cv.Optional(CONF_ENERGY_NOROT): energy_schema
+           ,cv.Required(CONF_INSTALLED_ALTITUDE): cv.float_range(-1, 6)
         }
     )
     .extend(cv.polling_component_schema("5s"))
@@ -95,6 +97,8 @@ async def to_code(config):
 
     psi_sens = await sensor.new_sensor(config[CONF_PSI_ANGLE])
     cg.add(var.set_psi_sensor(psi_sens))
+
+    cg.add(var.set_altitude(config[CONF_INSTALLED_ALTITUDE]))
 
     if CONF_INSTALLED_CAPACITY in config:
         cg.add(var.set_installed_capacity(config[CONF_INSTALLED_CAPACITY]))

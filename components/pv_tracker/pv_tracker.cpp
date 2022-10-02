@@ -66,10 +66,18 @@ double PVTrackerSensor::getPanelAngleEnergy(double &realPsi, double &energyIdeal
     double psi_prerot = atan2( sun_vect_prerot[1], sun_vect_prerot[2] );
     double psi = atan2( sun_vect[1], sun_vect[2] );
 
-    energyIdeal = computeEnergy(psi, sun_vect_prerot) * installed_capacity_;
+    double iD_airmass;
+    double airmass = getAirMass(90 - elevation_);
+    iD_airmass = computeSolarIntensity(90 - elevation_, airmass);
+    static const double am1p5_factor = (1.0 - 0.15); // calculated at zenith=48.2, h=0m
+
+    double capacity_1am = installed_capacity_ / am1p5_factor;
+
+
+    energyIdeal = iD_airmass * computeEnergy(psi, sun_vect_prerot) * capacity_1am;
     realPsi     = getRealAngle(psi);
-    energyReal  = computeEnergy(D2R(realPsi), sun_vect_prerot) * installed_capacity_;
-    energyNoRot = computeEnergy(0, sun_vect_prerot) * installed_capacity_;
+    energyReal  = iD_airmass * computeEnergy(D2R(realPsi), sun_vect_prerot) * capacity_1am;
+    energyNoRot = iD_airmass * computeEnergy(0, sun_vect_prerot) * capacity_1am;
 
     ESP_LOGD(TAG, "sun prerot  XYZ          = %f %f %f", sun_vect_prerot[0], sun_vect_prerot[1], sun_vect_prerot[2]);
     ESP_LOGD(TAG, "sun postrot XYZ          = %f %f %f", sun_vect[0], sun_vect[1], sun_vect[2]);
@@ -77,6 +85,8 @@ double PVTrackerSensor::getPanelAngleEnergy(double &realPsi, double &energyIdeal
     ESP_LOGD(TAG, "energy ideal             = %.2f"     , energyIdeal );
     ESP_LOGD(TAG, "energy real              = %.2f"     , energyReal );
     ESP_LOGD(TAG, "energy assuming no rot   = %.2f"     , energyNoRot );
+    ESP_LOGD(TAG, "iD                       = %.2f"     , iD_airmass );
+    ESP_LOGD(TAG, "air mass AM              = %.2f"     , airmass );
 
     return realPsi;
 }
@@ -136,6 +146,30 @@ double PVTrackerSensor::computeEnergy( double psi, double *sun_vect ) {
     return LinearAlgebra::dotProduct(panel_normal, sun_vect, 3);
 
 }
+
+
+
+double PVTrackerSensor::computeSolarIntensity(double zenith_deg, double airmass) {
+    double AM = airmass;
+
+    double iD;
+
+    double h = altitude_; // kilometers
+    const double a = 0.14;
+    iD = 1.353*( (1-a*h) * pow(0.7, pow(AM, 0.678)) + a*h);
+    return iD;
+}
+
+double PVTrackerSensor::getAirMass(double zenith_deg) {
+    if ( zenith_deg <= 90) {
+        return (1.0 / ( cos(D2R(zenith_deg)) + 0.50572*pow( (96.07995 - (zenith_deg)), -1.6364)));
+    }
+    return -1;
+}
+
+
+
+
 
 
 #define MAT_ITEM( mat, w, i, j) *((mat) + (i)*(w) + (j) )
@@ -213,7 +247,6 @@ double LinearAlgebra::dotProduct ( double *a, double *b, int dim) {
     }
     return p;
 }
-
 
 }
 }
