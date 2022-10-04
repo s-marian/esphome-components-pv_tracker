@@ -3,13 +3,19 @@
 #include "esphome/core/component.h"
 #include "esphome/components/sensor/sensor.h"
 #include "linear_algebra.h"
+#include "pv_backtracking.h"
 
 namespace esphome {
 namespace pv_tracker {
 
 class PVTrackerSensor : public PollingComponent {
  public:
-  PVTrackerSensor() : PollingComponent(5000) { set_south_tilt_angle(0); }
+  PVTrackerSensor() : PollingComponent(5000) { 
+    set_south_tilt_angle(0); 
+    bt.set_panel_width(1.85);
+    bt.set_systems_spacing(5.0);
+    bt.set_max_angle(D2R(45));
+  }
   void set_sensor_azimuth(sensor::Sensor *sensor) { azimuth_sensor_ = sensor; }
   void set_sensor_elevation(sensor::Sensor *sensor) { elevation_sensor_ = sensor; }
   void set_psi_sensor(sensor::Sensor *sensor) { psi_sensor_ = sensor; }
@@ -39,6 +45,7 @@ class PVTrackerSensor : public PollingComponent {
   double computeEnergy( double psi, double *sun_vect );
   double computeSolarIntensity(double zenith, double airmass);
   double getAirMass(double zenith_deg);
+  PVBacktracking bt;
 
  protected:
   void process_(float value);

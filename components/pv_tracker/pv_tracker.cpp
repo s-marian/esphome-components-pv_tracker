@@ -64,7 +64,8 @@ double PVTrackerSensor::getPanelAngleEnergy(double &realPsi, double &energyIdeal
 
 
     double psi_prerot = atan2( sun_vect_prerot[1], sun_vect_prerot[2] );
-    double psi = atan2( sun_vect[1], sun_vect[2] );
+    double psi_no_bt = atan2( sun_vect[1], sun_vect[2] );
+    double psi = bt.get_backtracking_angle(psi_no_bt);
 
     double iD_airmass;
     double airmass = getAirMass(90 - elevation_);
@@ -74,7 +75,7 @@ double PVTrackerSensor::getPanelAngleEnergy(double &realPsi, double &energyIdeal
     double capacity_1am = installed_capacity_ / am1p5_factor;
 
 
-    energyIdeal = iD_airmass * computeEnergy(psi, sun_vect_prerot) * capacity_1am;
+    energyIdeal = iD_airmass * computeEnergy(psi_no_bt, sun_vect_prerot) * capacity_1am;
     realPsi     = getRealAngle(psi);
     energyReal  = iD_airmass * computeEnergy(D2R(realPsi), sun_vect_prerot) * capacity_1am;
     energyNoRot = iD_airmass * computeEnergy(0, sun_vect_prerot) * capacity_1am;
