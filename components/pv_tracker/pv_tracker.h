@@ -25,11 +25,6 @@ class PVTrackerSensor : public PollingComponent {
   void setup() override {
     panel_angle_ = 0;
     //set_south_tilt_angle(0);
-/*
-    this->sensor_->add_on_state_callback([this](float value) { this->process_(value); });
-    if (this->sensor_->has_state())
-      this->process_(this->sensor_->state);
-*/
   }
 
   void update() override ;
