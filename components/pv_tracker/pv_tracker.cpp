@@ -145,6 +145,11 @@ double PVTrackerSensor::computeSolarIntensity(double zenith_deg, double airmass)
 
     double iD;
 
+
+    if ( AM < 0 ) {
+        return 0;
+    }
+
     double h = altitude_; // kilometers
     const double a = 0.14;
     iD = 1.353*( (1-a*h) * pow(0.7, pow(AM, 0.678)) + a*h) * 1.1;
