@@ -12,9 +12,7 @@ class PVTrackerSensor : public PollingComponent {
  public:
   PVTrackerSensor() : PollingComponent(5000) { 
     set_south_tilt_angle(0); 
-    bt.set_panel_width(1.85);
-    bt.set_systems_spacing(5.0);
-    bt.set_max_angle(D2R(45));
+    bt.set_max_angle(D2R(50));
   }
   void set_sensor_azimuth(sensor::Sensor *sensor) { azimuth_sensor_ = sensor; }
   void set_sensor_elevation(sensor::Sensor *sensor) { elevation_sensor_ = sensor; }
@@ -26,6 +24,8 @@ class PVTrackerSensor : public PollingComponent {
   void set_tilt_angle_bounds(float min, float max) { tilt_angle_min_ = min; tilt_angle_max_ = max; }
   void set_installed_capacity(double val) { installed_capacity_ = val; }
   void set_altitude(double altitude) { altitude_ = altitude; }
+  void set_bt_panel_width(double width) { bt.set_panel_width(width); }
+  void set_bt_systems_spacing(double spacing) { bt.set_systems_spacing(spacing); }
 
 
   void setup() override {

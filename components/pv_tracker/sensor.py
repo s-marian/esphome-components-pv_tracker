@@ -25,6 +25,8 @@ CONF_ENERGY_ACTUAL = "energy_actual"
 CONF_ENERGY_NOROT = "energy_norot"
 CONF_INSTALLED_CAPACITY = "installed_panels_capacity"
 CONF_INSTALLED_ALTITUDE = "altitude"
+CONF_PANEL_WIDTH = "panel_width"
+CONF_SYSTEMS_SPACING = "systems_spacing"
 
 # CONFIG_SCHEMA = (
 #     sensor.sensor_schema(
@@ -76,6 +78,8 @@ CONFIG_SCHEMA = (
            ,cv.Optional(CONF_ENERGY_ACTUAL): energy_schema
            ,cv.Optional(CONF_ENERGY_NOROT): energy_schema
            ,cv.Required(CONF_INSTALLED_ALTITUDE): cv.float_range(-1, 6)
+           ,cv.Required(CONF_PANEL_WIDTH): cv.distance
+           ,cv.Required(CONF_SYSTEMS_SPACING): cv.distance
         }
     )
     .extend(cv.polling_component_schema("5s"))
@@ -108,6 +112,8 @@ async def to_code(config):
         if key in config:
             energy_sens = await sensor.new_sensor(config[key])
             cg.add(getattr(var, f"set_energy_{type}_sensor")(energy_sens))
+    cg.add(var.set_bt_panel_width(config[CONF_PANEL_WIDTH]))
+    cg.add(var.set_bt_systems_spacing(config[CONF_SYSTEMS_SPACING]))
         
 
 
