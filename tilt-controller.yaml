@@ -92,6 +92,8 @@ sensor:
         - exponential_moving_average:
             alpha: 0.33
             send_every: 1
+    always_look_down: true
+    orientation: yx
   - platform: sun
     name: Sun Elevation
     type: elevation
@@ -107,12 +109,15 @@ sensor:
 
   - platform: pv_tracker
     south_tilt_angle: 20
-    tilt_angle_max: 50
-    tilt_angle_min: -50
+    tilt_angle_max: 45
+    tilt_angle_min: -45
     azimuth_sensor: azimuth
     elevation_sensor: elevation
-    update_interval: 5s
+    update_interval: 15s
     installed_panels_capacity: 1000
+    altitude: 0.7
+    panel_width: 1.85 m
+    systems_spacing: 10.0 m
     psi_angle:
       name: "Panels Rotation"
       id: pv_tracker_angle
@@ -131,6 +136,7 @@ position_controller:
   adjustment_threshold: 1.0
   pin_a: motor_forward_pin
   pin_b: motor_reverse_pin
+  rotation_offset: -4 deg
   
 
 output:
@@ -167,4 +173,7 @@ text_sensor:
       name: ESP Mac Wifi Address
     scan_results:
       name: ESP Latest Scan Results
+switch:
+  - platform: restart
+    name: "Tilt Sensor Restart"
 
