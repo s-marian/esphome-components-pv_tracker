@@ -3,9 +3,10 @@
 #include <math.h>
 
 
-#define PI M_PI
-#define D2R(x) ( (x) / 180.0 * PI)
-#define R2D(x) ( (x) * 180.0 / PI )
+#undef D2R
+#undef R2D
+#define D2R(x) ( (x) / 180.0 * M_PI)
+#define R2D(x) ( (x) * 180.0 / M_PI )
 
 namespace esphome {
 namespace pv_tracker {
@@ -52,7 +53,7 @@ void PVTrackerSensor::set_south_tilt_angle(float angle) {
 double PVTrackerSensor::getPanelAngleEnergy(double &realPsi, double &energyIdeal, double &energyReal, double &energyNoRot) {
     double sun_vect_prerot[3];
     double sun_vect[3];
-    LinearAlgebra::sphericToCart(1, PI/2 - D2R(elevation_), D2R(azimuth_), sun_vect_prerot);
+    LinearAlgebra::sphericToCart(1, M_PI/2 - D2R(elevation_), D2R(azimuth_), sun_vect_prerot);
 
     // east: y, west: -y
     // north: x, south: -x

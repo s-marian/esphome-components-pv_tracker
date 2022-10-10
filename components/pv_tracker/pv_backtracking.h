@@ -3,9 +3,11 @@
 #include <string.h>
 #include <math.h>
 
-#define PI M_PI
-#define D2R(x) ( (x) / 180.0 * PI)
-#define R2D(x) ( (x) * 180.0 / PI )
+#undef D2R
+#undef R2D
+
+#define D2R(x) ( (x) / 180.0 * M_PI)
+#define R2D(x) ( (x) * 180.0 / M_PI )
 
 class PVBacktracking {
 
