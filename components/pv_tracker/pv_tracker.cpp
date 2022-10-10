@@ -71,9 +71,7 @@ double PVTrackerSensor::getPanelAngleEnergy(double &realPsi, double &energyIdeal
     double iD_airmass;
     double airmass = getAirMass(90 - elevation_);
     iD_airmass = computeSolarIntensity(90 - elevation_, airmass);
-    static const double am1p5_factor = (1.0 - 0.15); // calculated at zenith=48.2, h=0m
-
-    double capacity_1am = installed_capacity_ / am1p5_factor;
+    double capacity_1am = installed_capacity_;
 
 
     energyIdeal = iD_airmass * computeEnergy(psi_no_bt, sun_vect_prerot) * capacity_1am;
@@ -94,18 +92,9 @@ double PVTrackerSensor::getPanelAngleEnergy(double &realPsi, double &energyIdeal
 }
 
 double PVTrackerSensor::getRealAngle(double psi) {
-    // during evening after sunset, align the panels to maximum rotation
-    if ( azimuth_ > 180 ) {
-        if ( elevation_ < -2 && elevation_ > -4 ) {
-            return -90;
-        } else if ( elevation_ <= -4 ) {
-            return 0;
-        }
-    } else {
-        // this is early morning
-        if ( elevation_ < -2 ) {
-            return 0;
-        }
+    // this is early morning
+    if ( elevation_ < -2 ) {
+        return 0;
     }
 
     double angle_deg = R2D(psi);
@@ -158,7 +147,7 @@ double PVTrackerSensor::computeSolarIntensity(double zenith_deg, double airmass)
 
     double h = altitude_; // kilometers
     const double a = 0.14;
-    iD = 1.353*( (1-a*h) * pow(0.7, pow(AM, 0.678)) + a*h);
+    iD = 1.353*( (1-a*h) * pow(0.7, pow(AM, 0.678)) + a*h) * 1.1;
     return iD;
 }
 
